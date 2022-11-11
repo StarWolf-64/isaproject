@@ -74,14 +74,16 @@ mov r15, r14       // return - sort is a void function
 // Save lr on stack and allocate space for local vars
 .label smallest
 sub r13, r13, #20   // space for smallest, i, r4, r5, and lr
-str r4, [r13, #8]   // save r4 on stack
-str r5, [r13, #12]  // save r5 on stack
+//str r4, [r13, #8]   // save r4 on stack
+//str r5, [r13, #12]  // save r5 on stack
 str r14, [r13, #16] // save lr on stack
 ldr r2, [r0]
 str r2, [r13, #0]   // int smallest = a[0]
 mov r4, r0          // put address of a in r4
 mov r3, #0
 str r3, [r13, #4]   // for (int i = 0;
+blr numelems
+mov r1,r0 
 .label loop1
 ldr r5, [r4],#4     // put ia[i] in r5, post increment r4
 cmp r5, r2          // if ia[i]>smallest
