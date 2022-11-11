@@ -66,8 +66,23 @@ mov r15, r14       // return
 // numelems is a leaf function
 // If you only use r0, r1, r2, r3; you do not need a stack
 .label numelems
-mov r0, 0xa        // hardcode to return a 10
-.label break
+sub r13, r13, #12	//allocate memory for stack
+str r4, [r13, #0]	//store r4
+str r5, [r13, #4]	//store r5
+str r14, [r13, #8]	//store link register
+mov r1, 0		//set c = 0
+.label elem_loop  	//this is where it goes when it starts the loop
+ldr r4, [r0], #4        //get value of array, post increment 
+cmp r4, 0		//checks if the value is 0		
+beq break		//if conditions met, leave loop
+add r1, r1, 1		//increment c
+bal elem_loop 		//returns to start of loop
+.label break		//this is where it goes if it leaves the loop
+mov r0, r1		//temporary hardcoded 7 return value
+ldr r4, [r13, #0]	//reloads r4 back from stack
+ldr r5, [r13, #4]	//reloads r5 back from stack
+ldr r14, [r13, #8]	//reloads link register back from stack
+add r13, r13, #12	//returns memory
 mov r15, r14       // return
 
 .text 0x600
@@ -87,8 +102,8 @@ mov r15, r14       // return - sort is a void function
 // Save lr on stack and allocate space for local vars
 .label smallest
 sub r13, r13, #20   // space for smallest, i, r4, r5, and lr
-//str r4, [r13, #8]   // save r4 on stack
-//str r5, [r13, #12]  // save r5 on stack
+str r4, [r13, #8]   // save r4 on stack
+str r5, [r13, #12]  // save r5 on stack
 str r14, [r13, #16] // save lr on stack
 ldr r2, [r0]
 str r2, [r13, #0]   // int smallest = a[0]
