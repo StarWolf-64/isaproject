@@ -15,7 +15,7 @@
 -5
 -10
 50
-0
+0 //check if value is equal to zero
 .label sib
 500
 43
@@ -33,9 +33,22 @@
 // sum_array is a leaf function
 // If you only use r0, r1, r2, r3; you do not need a stack
 .label sum_array
-mov r0, 2          // hardcode to return a 2
-mov r15, r14       // return
+mov r1,0 //stores value of 0 into r1
+.label sum_array condit //start of the loop
+cmp r0,#0 //compare value of ia address to 0
+bal sum_array condit // return to start of the loop
+bne skip3 //skip if not equal to
+.label skip3
+add r1,r1,r0 // s=s+*ia
+ldr r0, [r4],#4 //ia++
+.label break1
+//mov 
+mov r15,r14
 
+
+//mov r0, 2          // hardcode to return a 2
+mov r15, r14       // return
+add 
 .text 0x400
 // r0 has ia1 - address of null terminated array
 // r1 has ia1 - address of null terminated array
