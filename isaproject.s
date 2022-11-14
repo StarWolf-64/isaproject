@@ -154,23 +154,30 @@ ldr r14, [r13, #16] // restore lr
 add r13, r13, #20   // restore r13
 mov r15, r14        // return to caller
 
-                   // Allocate stack
-// blr numelems    // count elements in ia[]
-                   // create loop to find smallest
-mov r0, 2          // hardcode to return a 2
-		   // Deallocate stack
-mov r15, r14       // return
-
 .text 0x800
 // r0 has an integer
 // factorial must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label factorial
-                   // Allocate stack
-		   // implement algorithm
-//blr factorial    // factorial calls itself
-		   // Deallocate stack
-mov r0, 120        // hardcode 5! as return value
+sub r13, r13, #16 // Allocate stack
+str r0, [r13, #0] //store incoming value
+str r4, [r13, #4]
+str r5, [r13, #8]
+str r14, [r13, #12]
+cmp r0, 1
+bne noteq
+bal postif
+.label noteq
+sub r0, r0, 1
+blr factorial    // factorial calls itself
+ldr r1, [r13, #0]
+mul r0, r1, r0
+.label postif
+ldr r4, [r13, #4]
+ldr r5, [r13, #8]
+ldr r14, [r13, #12]
+add r13, r13, #16 // Deallocate stack
+//mov r0, 120        // hardcode 5! as return value
 mov r15, r14       // return
 
 .text 0x900
