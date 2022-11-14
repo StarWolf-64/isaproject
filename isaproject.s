@@ -25,42 +25,66 @@
 50
 0
 .label fmt1
-.string //sia[%d]: %d
+.string //sia[%d]: %d how does argument
 .label fmt2
 .string //Something bad
+.label fmt3 // *not sure about this format 
+.string //s1: %d, s2: %d\n, s1: s2
+.label a1
+0
+.label a2
+0
 .text 0x300
 // r0 has ia - address of null terminated array
 // sum_array is a leaf function
 // If you only use r0, r1, r2, r3; you do not need a stack
 .label sum_array
-mov r1,0 //stores value of 0 into r1
-.label sum_array condit //start of the loop
-cmp r0,#0 //compare value of ia address to 0
-bal sum_array condit // return to start of the loop
-bne skip3 //skip if not equal to
-.label skip3
-add r1,r1,r0 // s=s+*ia
-ldr r0, [r4],#4 //ia++
-.label break1
-//mov 
-mov r15,r14
-
-
-//mov r0, 2          // hardcode to return a 2
-mov r15, r14       // return
-add 
+sub r13,r13,#12 //allocate memory for stack
+str r4,[r13,#0] // stores r4
+str r5,[r13,#4] // stores r5
+str r14,[r13,#8] // stores link register
+mov r1,0 //int s=0;
+.label sum_array_condit //start of the loop
+ldr r4,[r0],#4 //get value of array
+cmp r4,#0 //while(*ia !=0) 
+beq break1 //leave loop if equal
+add r1,r1,r0 //increment s+=*ia
+bal sum_array_condit //return to the start of the loop
+.label break1 //if you leave loop go here
+mov r0,r1 //value meant to be returned
+ldr r4, [r13,#0] //reload r4
+ldr r5, [r13,#4] //reload r5
+ldr r14,[r13,#8] //reload link reg from stack
+add r13,r13,#12 //return memory
+mov r15,r14 //return 
 .text 0x400
 // r0 has ia1 - address of null terminated array
 // r1 has ia1 - address of null terminated array
 // cmp_arrays must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label cmp_arrays
-                   // Allocate stack
-                   // Call sum_array two times
-mov r0, -1         // hardcode to return -1
-		   // Deallocate stack
-mov r15, r14       // return
-
+sub r13,r13,#12 //allocate memory for stack
+str r4,[r13,#0] // stores r4
+str r5,[r13,#4] // stores r5
+str r14,[r13,#8] // stores link register
+mva r0,0x100 //passes the addr of arry 1 sia
+blr sum_array    //Call sum_array 1st time
+str r0,sum_array //store return val into r0
+str r0,a1  // put value into label
+mva r0,0x11C //passes addr arry 2 sib
+blr sum_array //Call sum_array 2nd time
+str r0,sum_array //store return val into r0
+str r0,a2 //store return val into label
+mov r0,r1 //mov r1(2nd) to r0(1st arg)
+ker #0x11 // Kernel call to printf
+blr fmt3 //branch to format  
+mov r1,r0               
+mov r0, -1 // hardcode to return -1
+ldr r4, [r13,#0] //reload r4 Deallocate stack
+ldr r5, [r13,#4] //reload r5
+ldr r14,[r13,#8] //reload link reg from stack
+add r13,r13,#12 //return memory
+mov r15, r14 // return
 .text 0x500
 // r0 has ia - address of null terminated array
 // numelems is a leaf function
