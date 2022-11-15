@@ -112,10 +112,47 @@ mov r15, r14       // return
 // sort must allocate a stack
 // Save lr on stack and allocate space for local vars
 .label sort
-                   // Allocate stack
-// blr numelems    // count elements in ia[]
-                   // create nested loops to sort
-		   // Deallocate stack
+sub r13, r13, #24 // Allocate stack
+str r0, [r13, #0] //array pointer
+str r4, [r13, #4]
+str r5, [r13, #8]
+str r6, [r13, #12]
+str r7, [r13, #16]
+str r14, [r13, #20]
+blr numelems    // count elements in ia[]
+mov r4, r0
+mov r1, 0	// i counter = 0
+.label outerloop  // create nested loops to sort
+ldr r0, [r13, #0]
+mov r2, 0	// j counter = 0
+sub r3, r4, 1
+sub r3, r3, r1
+cmp r1, r4
+bge endouter
+.label innerloop
+cmp r2, r3
+bge endinner
+ldr r5, [r0]
+ldr r6, [r0, #4]
+.label sortif
+cmp r5, r6
+ble endsortif
+str r5, [r0, #4]
+str r6, [r0]
+.label endsortif
+add r0, r0, #4
+add r2, r2, 1
+bal innerloop
+.label endinner
+add r1, r1, 1
+bal outerloop
+.label endouter
+ldr r4, [r13, #4]
+ldr r5, [r13, #8]
+ldr r6, [r13, #12]
+ldr r7, [r13, #16]
+ldr r14, [r13, #20]
+add r13, r13, #24  // Deallocate stack
 mov r15, r14       // return - sort is a void function
 
 .text 0x700
@@ -215,6 +252,8 @@ blr printf
 //     printf("ia[%d]: %d", i, sia[i]);
 mov r4, 0          // i to r4
 mva r5, sia   // address is sia to r5
+//mva r0, sia 	//test value
+//blr sort	//test value
 .label loop4times  // print 3 elements if sia
 cmp r4, 4
 bge end_loop4times
