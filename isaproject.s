@@ -25,11 +25,11 @@
 50
 0
 .label fmt1
-.string //sia[%d]: %d how does argument
+.string //sia[%d]: %d
 .label fmt2
 .string //Something bad
-.label fmt3 // *not sure about this format 
-.string //s1: %d, s2: %d\n 
+.label fmt3 // 
+.string //s1: %d, s2: %d 
 .label a1
 0
 .label a2
