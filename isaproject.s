@@ -48,7 +48,7 @@ mov r1,0 //int s=0;
 ldr r4,[r0],#4 //get value of array
 cmp r4,#0 //while(*ia !=0) 
 beq break1 //leave loop if equal
-add r1,r1,r0 //increment s+=*ia
+add r1,r1,r4 //increment s+=*ia
 bal sum_array_condit //return to the start of the loop
 .label break1 //if you leave loop go here
 mov r0,r1 //value meant to be returned
@@ -69,11 +69,9 @@ str r5,[r13,#4] // stores r5
 str r14,[r13,#8] // stores link register
 mva r0,0x100 //passes the addr of arry 1 sia
 blr sum_array    //Call sum_array 1st time
-str r0,sum_array //store return val into r0
 str r0,a1  // put value into label
 mva r0,0x11C //passes addr arry 2 sib
 blr sum_array //Call sum_array 2nd time
-str r0,sum_array //store return val into r0
 str r0,a2 //store return val into label
 mov r0,r1 //mov r1(2nd) to r0(1st arg)
 ker #0x11 // Kernel call to printf
