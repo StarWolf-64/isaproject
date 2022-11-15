@@ -29,7 +29,7 @@
 .label fmt2
 .string //Something bad
 .label fmt3 // *not sure about this format 
-.string //s1: %d, s2: %d\n, s1: s2
+.string //s1: %d, s2: %d\n 
 .label a1
 0
 .label a2
@@ -74,10 +74,23 @@ mva r0,0x11C //passes addr arry 2 sib
 blr sum_array //Call sum_array 2nd time
 str r0,a2 //store return val into label
 mov r0,r1 //mov r1(2nd) to r0(1st arg)
+mov r1,fmt3 //puts the format str into r1
+ldr r2,a1
+ldr r3,a2
 ker #0x11 // Kernel call to printf
-blr fmt3 //branch to format  
-mov r1,r0               
-mov r0, -1 // hardcode to return -1
+cmp r2,r3 //compare the arrays get resp values
+beq equal //branch if ==
+bgt s1G // branch if s1>s2
+blt s2G // branch if s1<s2
+.label equal
+mov r0,0
+bal endS 
+.label s1G
+mov r0,1
+bal endS 
+.label s2G
+mov r0,-1
+.label endS                
 ldr r4, [r13,#0] //reload r4 Deallocate stack
 ldr r5, [r13,#4] //reload r5
 ldr r14,[r13,#8] //reload link reg from stack
