@@ -42,6 +42,16 @@
 .string //cmp_arrays(ia, sib): %d
 .label fmt7
 .string //ia[%d]: %d
+.label fmt8
+.string //smallest(ia): %d
+.label fmt9
+.string //smallest(sia): %d
+.label fmt10
+.string //Nice sort and smallest
+.label fmt11
+.string //factorial(4) is: %d
+.label fmt12 
+.string //factorial(7) is: %d
 .text 0x300
 // r0 has ia - address of null terminated array
 // sum_array is a leaf function
@@ -320,10 +330,10 @@ str r0,[sp,4] //n = num_elems(ia)
 // The code there generates the ker instruction
 // You call printf with
 // r0 - has address of format string - "Something bad"
-mva r0, fmt2
-blr printf
+//mva r0, fmt2
+//blr printf
 //
-// for (int i = 0; i < 4; i++)
+// for (int i := 0; i < 4; i++)
 //     printf("ia[%d]: %d", i, sia[i]);
 mov r4, 0          // i to r4
 mva r5, r7   // address is ia to r5
@@ -344,19 +354,83 @@ ker #0x11          // Kernel call to printf
 adi r4, r4, 1      // i++
 bal loop4times
 .label end_loop4times
+mva r0,sia //move value to be sorted
+blr sort //branch to sort function
 // int n = numelems(sia);
 mva r0, sia        // put address of sia in r0
-blr numelems       // n = numelems(sia)
+blr numelems      // n = numelems(sia)
 str r0, [sp, 4]
+mov r4, 0          // i to r4
+mva r5, sia   // address is ia to r5
+//mva r0, sia   //test value
+//blr sort      //test value
+ldr r6,[sp,4]
+.label loopNtimes  // print 3 elements if sia
+cmp r4,r6
+bge end_loopNtimes
+// Kernel call to printf expects parameters
+// r1 - address of format string - "ia[%d]: %d"
+// r2 - value for first %d
+// r3 - value for second %d
+mva r1, fmt1       // fmt1 to r1
+mov r2, r4         // i to r2
+ldr r3, [r5], 4    // sia[i] to r3
+ker #0x11          // Kernel call to printf
+adi r4, r4, 1      // i++
+bal loopNtimes
+.label end_loopNtimes
+mva r0,r7        // put address of ia in r0
+blr smallest       // sm1 = smallest(ia)
+str r0, [sp, 8]
 // int sm1 = smallest(sia);
 mva r0, sia        // put address of sia in r0
-blr smallest       // sm1 = smallest(sia)
-str r0, [sp, 8]    // store return value in sm1
+blr smallest       // sm2 = smallest(sia)
+str r0, [sp, 12]    // store return value in sm2
+mva r0,fmt8 //move addr to fmt8
+ldr r1,[sp,8]
+blr printf // print fmt8
+mva r0,fmt9 //move addr to fmt9
+ldr r1,[sp,12]
+blr printf // print fmt9
+ldr r0,[sp,8] //smallest ia
+ldr r1,[r7] //dereference r7
+cmp r0,r1 //compare
+bne smallestElse1
+mva r0, fmt2
+blr printf //print something bad
+bal smallestEndif1 
+.label smallestElse1
+mva r0, fmt10
+blr printf //print Nice sort and smallest
+.label smallestEndif1
+ldr r0,[sp,12] //smallest ia
+ldr r1,sia  
+cmp r0,r1 //compare
+bne smallestElse2
+mva r0, fmt2
+blr printf //print something bad
+bal smallestEndif2
+.label smallestElse2
+mva r0, fmt10
+blr printf //print Nice sort and smallest
+.label smallestEndif2
 // cav = cmp_arrays_sia, sib);
-mva r0, sia        // put address of sia in r0
-mva r1, sib        // put address of sib in r1
-blr cmp_arrays
-str r0, [sp, 0]
+//mva r0, sia        // put address of sia in r0
+//mva r1, sib        // put address of sib in r1
+//blr cmp_arrays
+//str r0, [sp, 0]
+mov r0,4
+blr factorial //return value for factorial 
+str r0,[sp,4] //store value
+mov r1,r0
+mva r0,fmt11
+blr printf // print factorial(4) is: %d
+mov r0,7
+blr factorial //return value for factorial
+str r0,[sp,4] //store value
+mov r1,r0
+mva r0,fmt12
+blr printf // print factorial(7) is: %d
 // Do not deallocate stack.
 // This leaves r13 with an address that can be used to dump memory
 // > d 0x4ff0 
