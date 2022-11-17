@@ -73,10 +73,13 @@ sub r13,r13,#12 //allocate memory for stack
 str r4,[r13,#0] // stores r4
 str r5,[r13,#4] // stores r5
 str r14,[r13,#8] // stores link register
-mva r0,0x100 //passes the addr of arry 1 sia
+mov r4,r0 //passes the addr of arry 1 sia
+mov r5,r1
+//mva r4,0x100 //passes the addr of arry 1 sia
 blr sum_array    //Call sum_array 1st time
 str r0,a1  // put value into label
-mva r0,0x11C //passes addr arry 2 sib
+mov r0,r5 
+//mva r4,0x11C //passes addr arry 2 sib
 blr sum_array //Call sum_array 2nd time
 str r0,a2 //store return val into label
 mov r0,r1 //mov r1(2nd) to r0(1st arg)
