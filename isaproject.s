@@ -294,7 +294,8 @@ str r0,[sp,0] // storing the output depending on condit
 mov r1,r0 //put in place for printf
 mva r0,fmt4 //put value to be printed
 blr printf //third print
-ldr r0,[sp,20]
+mov r0,r13 //gives us mem addr of cav
+add r0,r0,20 // move 20 from cav
 mva r1,sia //other parm
 blr cmp_arrays //branch to method
 str r0,[sp,0] // storing the output depending on condit
