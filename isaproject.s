@@ -34,6 +34,12 @@
 0
 .label a2
 0
+.label fmt4
+.string //cmp_arrays(sia, sib): %d
+.label fmt5
+.string //cmp_arrays(sia, sia): %d
+.label fmt6
+.string //cmp_arrays(ia, sib): %d
 .text 0x300
 // r0 has ia - address of null terminated array
 // sum_array is a leaf function
@@ -240,15 +246,60 @@ mov r15, r14       // return
 //     cav = cmp_arrays(sia, sib);
 // }
 .label main
-sbi sp, sp, 16     // allocate space for stack
+
+sbi sp, sp, 40     // allocate space for stack
                    // [sp,0] is int cav
                    // [sp,4] is int n
                    // [sp,8] is int sm1
-str lr, [sp, 12]   // [sp,12] is lr (save lr)
+str lr, [sp, 16]   // [sp,12] is lr (save lr)
 mov r0, 0
 str r0, [sp, 0]    // cav = 0;
 str r0, [sp, 4]    // n = 0;
 str r0, [sp, 8]    // sm1 = 0;
+str r0, [sp,12]    //sm2 =0;
+mov r0,#2
+str r0, [sp,20]
+mov r0,#3
+str r0, [sp,24]
+mov r0,#5
+str r0, [sp,28]
+mov r0,#1
+str r0, [sp,32]
+mov r0,#0
+str r0, [sp,36]
+mva r0,sia //parameters for compare_array 
+mva r1,sib //other parm
+blr cmp_arrays //branch to method
+str r0,[sp,0] // storing the output depending on condit
+mov r1,r0 //put in place for printf
+mva r0,fmt4 //put value to be printed
+blr printf //first print
+mva r0,sia //parameters for compare_array
+mva r1,sia //other parm
+blr cmp_arrays //branch to method
+str r0,[sp,0] // storing the output depending on condit
+mov r1,r0 //put in place for printf
+mva r0,fmt5 //put value to be printed
+blr printf //second print
+mov r0,4 //three line repres sib[0]=4
+mva r1,sib
+str r0,[r1,#0]
+mva r0,sia //parameters for compare_array
+mva r1,sib //other parm
+blr cmp_arrays //branch to method
+str r0,[sp,0] // storing the output depending on condit
+mov r1,r0 //put in place for printf
+mva r0,fmt4 //put value to be printed
+blr printf //third print
+ldr r0,[sp,20]
+mva r1,sia //other parm
+blr cmp_arrays //branch to method
+str r0,[sp,0] // storing the output depending on condit
+mov r1,r0 //put in place for printf
+mva r0,fmt6 //put value to be printed
+blr printf //fourth print
+
+
 // printf("Something bad");
 // Kernel call to printf expects parameters
 // r1 - address of format string - "Something bad"
