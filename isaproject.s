@@ -396,23 +396,23 @@ ldr r0,[sp,8] //smallest ia
 ldr r1,[r7] //dereference r7
 cmp r0,r1 //compare
 bne smallestElse1
-mva r0, fmt2
-blr printf //print something bad
-bal smallestEndif1 
-.label smallestElse1
 mva r0, fmt10
 blr printf //print Nice sort and smallest
+bal smallestEndif1 
+.label smallestElse1
+mva r0, fmt2
+blr printf //print something bad
 .label smallestEndif1
 ldr r0,[sp,12] //smallest ia
 ldr r1,sia  
 cmp r0,r1 //compare
 bne smallestElse2
-mva r0, fmt2
-blr printf //print something bad
-bal smallestEndif2
-.label smallestElse2
 mva r0, fmt10
 blr printf //print Nice sort and smallest
+bal smallestEndif2
+.label smallestElse2
+mva r0, fmt2
+blr printf //print something bad
 .label smallestEndif2
 // cav = cmp_arrays_sia, sib);
 //mva r0, sia        // put address of sia in r0
