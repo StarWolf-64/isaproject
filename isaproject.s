@@ -40,6 +40,8 @@
 .string //cmp_arrays(sia, sia): %d
 .label fmt6
 .string //cmp_arrays(ia, sib): %d
+.label fmt7
+.string //ia[%d]: %d
 .text 0x300
 // r0 has ia - address of null terminated array
 // sum_array is a leaf function
@@ -296,13 +298,18 @@ mva r0,fmt4 //put value to be printed
 blr printf //third print
 mov r0,r13 //gives us mem addr of cav
 add r0,r0,20 // move 20 from cav
+mov r7,r0 // r7 contains start of ia addr
 mva r1,sia //other parm
 blr cmp_arrays //branch to method
 str r0,[sp,0] // storing the output depending on condit
 mov r1,r0 //put in place for printf
 mva r0,fmt6 //put value to be printed
 blr printf //fourth print
-
+mov r0,r7
+blr sort // sort ia
+mov r0,r7
+blr numelems // branch to num_elems
+str r0,[sp,4] //n = num_elems(ia)
 
 // printf("Something bad");
 // Kernel call to printf expects parameters
@@ -319,17 +326,18 @@ blr printf
 // for (int i = 0; i < 4; i++)
 //     printf("ia[%d]: %d", i, sia[i]);
 mov r4, 0          // i to r4
-mva r5, sia   // address is sia to r5
+mva r5, r7   // address is ia to r5
 //mva r0, sia 	//test value
 //blr sort	//test value
+ldr r6,[sp,4] 
 .label loop4times  // print 3 elements if sia
-cmp r4, 4
+cmp r4,r6
 bge end_loop4times
 // Kernel call to printf expects parameters
 // r1 - address of format string - "ia[%d]: %d"
 // r2 - value for first %d
 // r3 - value for second %d
-mva r1, fmt1       // fmt1 to r1
+mva r1, fmt7       // fmt1 to r1
 mov r2, r4         // i to r2
 ldr r3, [r5], 4    // sia[i] to r3
 ker #0x11          // Kernel call to printf
